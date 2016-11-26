@@ -158,7 +158,7 @@ public class MainListActivity extends AppCompatActivity {
                         try {
                             getDatabaseHelper().getNoteDao().create(a);
 
-                            //provera podesenja
+                            //provera podesavanja
                             boolean toast = prefs.getBoolean(NOTIF_TOAST, false);
                             boolean status = prefs.getBoolean(NOTIF_STATUS, false);
 
