@@ -28,6 +28,11 @@
             android:icon="@mipmap/ic_launcher"
             android:label="Note Detail"
             android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".preferences.Preferences"
+            android:label="@string/activity_settings_name"
+            android:parentActivityName=".activity.MainListActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
 
     </application>
 

@@ -38,7 +38,7 @@
             android:text="Name"/>
 
         <EditText
-            android:id="@+id/actor_name"
+            android:id="@+id/note_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 
@@ -53,10 +53,10 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Biography"/>
+            android:text="Description"/>
 
         <EditText
-            android:id="@+id/actor_biography"
+            android:id="@+id/note_description"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 
@@ -71,38 +71,17 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Rating"/>
-
-        <RatingBar
-            android:id="@+id/acrtor_rating"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:numStars="5"
-            android:stepSize="1.0"
-            android:rating="0.0"/>
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_marginBottom="5dp">
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Birth"/>
+            android:text="Date"/>
 
         <EditText
-            android:id="@+id/actor_birth"
+            android:id="@+id/note_date"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 
     </LinearLayout>
 
     <ListView
-        android:id="@+id/priprema_actor_movies"
+        android:id="@+id/note_data_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
