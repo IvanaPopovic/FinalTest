@@ -1,16 +1,29 @@
 package com.example.android.finaltest.activity;
 
+import android.app.Dialog;
+import android.app.NotificationManager;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.app.NotificationCompat;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListAdapter;
 import android.widget.ListView;
+import android.widget.RatingBar;
+import android.widget.Toast;
 
 import com.example.android.finaltest.db.DatabaseHelper;
 import com.example.android.finaltest.R;
@@ -70,6 +83,121 @@ public class MainListActivity extends AppCompatActivity {
             e.printStackTrace();
         }
     }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.list_menu, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        refresh();
+    }
+
+    private void refresh() {
+        ListView listview = (ListView) findViewById(R.id.note_list);
+
+        if (listview != null){
+            ArrayAdapter<Note> adapter = (ArrayAdapter<Note>) listview.getAdapter();
+
+            if(adapter!= null)
+            {
+                try {
+                    adapter.clear();
+                    List<Note> list = getDatabaseHelper().getNoteDao().queryForAll();
+
+                    adapter.addAll(list);
+
+                    adapter.notifyDataSetChanged();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+    private void showStatusMesage(String message){
+        NotificationManager mNotificationManager = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
+        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this);
+        mBuilder.setSmallIcon(R.drawable.ic_launcher);
+        mBuilder.setContentTitle("Final test");
+        mBuilder.setContentText(message);
+
+        Bitmap bm = BitmapFactory.decodeResource(getResources(), R.drawable.ic_action_add);
+
+        mBuilder.setLargeIcon(bm);
+        // notificationID allows you to update the notification later on.
+        mNotificationManager.notify(1, mBuilder.build());
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        switch (item.getItemId()){
+            case R.id.id_add_new_note:
+                //DIALOG ZA UNOS PODATAKA
+                final Dialog dialog = new Dialog(this);
+                dialog.setContentView(R.layout.detail_activity_layout);
+
+                Button add = (Button) dialog.findViewById(R.id.save_note);
+                add.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        EditText name = (EditText) dialog.findViewById(R.id.note_name);
+                        EditText desc = (EditText) dialog.findViewById(R.id.note_description);
+                        EditText date = (EditText) dialog.findViewById(R.id.note_date);
+
+                        Note a = new Note();
+                        a.setmName(name.getText().toString());
+                        a.setmDescription(desc.getText().toString());
+                        a.setmDate(date.getText().toString());
+
+                        try {
+                            getDatabaseHelper().getNoteDao().create(a);
+
+                            //provera podesenja
+                            boolean toast = prefs.getBoolean(NOTIF_TOAST, false);
+                            boolean status = prefs.getBoolean(NOTIF_STATUS, false);
+
+                            if (toast){
+                                Toast.makeText(MainListActivity.this, "Added new note", Toast.LENGTH_SHORT).show();
+                            }
+
+                            if (status){
+                                showStatusMesage("Added new note");
+                            }
+
+                            //REFRESH
+                            refresh();
+
+                        } catch (SQLException e) {
+                            e.printStackTrace();
+                        }
+
+                        dialog.dismiss();
+
+                    }
+                });
+
+                dialog.show();
+
+                break;
+            case R.id.id_about:
+
+                AlertDialog alertDialog = new AboutDialog(this).prepareDialog();
+                alertDialog.show();
+                break;
+            case R.id.id_preferences:
+                startActivity(new Intent(MainListActivity.this, Preferences.class));
+                break;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
 
 
     //jos koda ovde - DRUGE METODE

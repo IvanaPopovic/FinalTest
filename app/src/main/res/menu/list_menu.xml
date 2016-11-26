@@ -2,13 +2,13 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <item android:id="@+id/id_add_new_actor"
+    <item android:id="@+id/id_add_new_note"
         android:title="@string/fragment_detal_action_add"
         android:icon="@android:drawable/ic_menu_add"
         app:showAsAction="ifRoom" />
 
     <item android:id="@+id/id_preferences"
-        android:title="Preferences"
+        android:title="Settings"
         app:showAsAction="ifRoom" />
 
     <item android:id="@+id/id_about"
