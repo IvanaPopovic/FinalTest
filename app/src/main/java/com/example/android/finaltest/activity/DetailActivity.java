@@ -1,19 +1,28 @@
 package com.example.android.finaltest.activity;
 
+import android.app.Dialog;
+import android.app.NotificationManager;
+import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Movie;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.app.NotificationCompat;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListAdapter;
 import android.widget.ListView;
-import android.widget.RatingBar;
 import android.widget.Toast;
+
 
 import com.example.android.finaltest.db.DatabaseHelper;
 import com.example.android.finaltest.db.model.Data;
@@ -32,6 +41,8 @@ public class DetailActivity extends AppCompatActivity {
     private DatabaseHelper databaseHelper;
     private SharedPreferences prefs;
     private Note a;
+    public static String NOTIF_TOAST = "notif_toast";
+    public static String NOTIF_STATUS = "notif_statis";
 
     private EditText name;
     private EditText desc;
@@ -111,6 +122,108 @@ public class DetailActivity extends AppCompatActivity {
                 }
             }
         }
+    }
+
+    private void showStatusMesage(String message){
+        NotificationManager mNotificationManager = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
+        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this);
+        mBuilder.setSmallIcon(R.drawable.ic_launcher);
+        mBuilder.setContentTitle("Final test");
+        mBuilder.setContentText(message);
+
+        Bitmap bm = BitmapFactory.decodeResource(getResources(), R.drawable.ic_action_add);
+
+        mBuilder.setLargeIcon(bm);
+        // notificationID allows you to update the notification later on.
+        mNotificationManager.notify(1, mBuilder.build());
+    }
+
+    private void showMessage(String message){
+        //provera podesavanja
+        boolean toast = prefs.getBoolean(NOTIF_TOAST, false);
+        boolean status = prefs.getBoolean(NOTIF_STATUS, false);
+
+        if (toast){
+            Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+        }
+
+        if (status){
+            showStatusMesage(message);
+        }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.detail_menu, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+            case R.id.id_add:
+                //OTVORI SE DIALOG UNESU SE INFORMACIJE
+                final Dialog dialog = new Dialog(this);
+                dialog.setContentView(R.layout.add_data);
+
+                Button add = (Button) dialog.findViewById(R.id.add_data_btn);
+                add.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        EditText name = (EditText) dialog.findViewById(R.id.data_name);
+                        EditText desc = (EditText) dialog.findViewById(R.id.data_description);
+
+                        Data m = new Data();
+                        m.setmName(name.getText().toString());
+                        m.setmDescription(desc.getText().toString());
+                        m.setmNote(a);
+
+                        try {
+                            getDatabaseHelper().getDataDao().create(m);
+                        } catch (SQLException e) {
+                            e.printStackTrace();
+                        }
+                        //URADITI REFRESH
+                        refresh();
+
+                        showMessage("New data added to note");
+
+                        dialog.dismiss();
+                    }
+                });
+
+                dialog.show();
+
+                break;
+            case R.id.id_edit:
+                //POKUPITE INFORMACIJE SA EDIT POLJA
+                a.setmName(name.getText().toString());
+                a.setmDescription(desc.getText().toString());
+
+                try {
+                    getDatabaseHelper().getNoteDao().update(a);
+
+                    showMessage("Note data updated");
+
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+
+                break;
+            case R.id.id_remove:
+                try {
+                    getDatabaseHelper().getNoteDao().delete(a);
+
+                    showMessage("Note deleted");
+
+                    finish(); //moramo pozvati da bi se vratili na prethodnu aktivnost
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+                break;
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 
 
